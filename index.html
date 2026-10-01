@@ -9,6 +9,13 @@
 <title>Cas d'usage IA en communication</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<script>
+(function () {
+  var t = "light";
+  try { var s = localStorage.getItem("cas-usage-ia-theme"); if (s === "dark" || s === "light") t = s; } catch (e) {}
+  document.documentElement.setAttribute("data-theme", t);
+})();
+</script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Montserrat:wght@400;500;600;700&display=swap">
 </head>
 <body>
@@ -68,6 +75,14 @@ p { margin: 0; }
 button { font: inherit; color: inherit; }
 :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--accent-ink); }
+
+/* Bouton de thème */
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.theme { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 999px; padding: 6px 14px 6px 10px; font-size: 13px; font-weight: 600; cursor: pointer; transition: border-color .2s, background .2s; }
+.theme:hover { border-color: var(--accent); }
+.theme svg { flex: none; }
+.theme .moon, :root[data-theme="dark"] .theme .sun { display: none; }
+:root[data-theme="dark"] .theme .moon { display: inline; }
 
 /* En-tête */
 .hero { padding-block: 44px 28px; display: grid; gap: 28px; }
@@ -226,8 +241,15 @@ dialog[open]::backdrop { animation: fade .28s ease; }
 </style>
 
 <header class="wrap hero">
-  <div class="hero-text">
+  <div class="topbar">
     <p class="eyebrow">Réseau Procivis · IAttitude</p>
+    <button class="theme" id="theme" type="button" aria-label="Passer en thème sombre">
+      <svg class="sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>
+      <svg class="moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>
+      <span id="theme-label">Clair</span>
+    </button>
+  </div>
+  <div class="hero-text">
     <h1>Ce que l'IA peut faire pour un service communication</h1>
     <p class="lead">111 cas d'usage en place dans le réseau, classés selon ce que l'IA doit atteindre pour faire le travail. <b>5 % seulement des sessions de travail se contentent de la conversation.</b> Tout le reste demande un accès de plus : les dossiers du poste, le navigateur ou les logiciels eux-mêmes.</p>
   </div>
@@ -530,6 +552,17 @@ dialog[open]::backdrop { animation: fade .28s ease; }
     if (e.key === "ArrowRight" && !next.disabled) { e.preventDefault(); next.click(); }
     if (e.key === "ArrowLeft" && !prev.disabled) { e.preventDefault(); prev.click(); }
   });
+
+  // Bascule clair / sombre
+  const themeBtn = document.getElementById("theme"), themeLabel = document.getElementById("theme-label");
+  function applyTheme(t, save) {
+    document.documentElement.setAttribute("data-theme", t);
+    themeLabel.textContent = t === "dark" ? "Sombre" : "Clair";
+    themeBtn.setAttribute("aria-label", t === "dark" ? "Passer en thème clair" : "Passer en thème sombre");
+    if (save) { try { localStorage.setItem("cas-usage-ia-theme", t); } catch (e) {} }
+  }
+  applyTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light", false);
+  themeBtn.addEventListener("click", () => applyTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark", true));
 
   render();
   const m = /^#c(\d)-(\d+)$/.exec(location.hash || "");
