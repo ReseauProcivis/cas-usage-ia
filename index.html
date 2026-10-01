@@ -438,7 +438,10 @@ dialog[open]::backdrop { animation: fade .28s ease; }
   function goCatalogue(force) {
     syncH();
     const top = mainEl.getBoundingClientRect().top;
-    if (force || top < stickyH()) mainEl.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+    if (force || top < stickyH()) {
+      const y = scrollY + top - stickyH() - 8;
+      window.scrollTo(0, Math.max(0, y));
+    }
   }
   function setLevel(n, force) { state.lvl = n; render(); goCatalogue(force); }
   function resetAll() {
